@@ -67,8 +67,8 @@ patterns (Board board) = board ++ (transpose board)
 
 winner :: Board -> Cell
 winner board
-  | any (isInfixOf [P, P, P, P, P]) (patterns board) = P
   | any (isInfixOf [C, C, C, C, C]) (patterns board) = C
+  | any (isInfixOf [P, P, P, P, P]) (patterns board) = P
   | winDiag board 0 0 == P = P
   | winDiag board 0 0 == C = C
   | otherwise = Null
@@ -128,7 +128,7 @@ getInRowRight :: Board -> Cell -> Integer -> Integer -> Integer -> Integer
 getInRowRight board player l c score = let right = getValBoard l (c+1) board in
 										 if right == player then 
 										   getInRowRight board player l (c+1) (score+1)
-										else if (c+1) > 9 || right /= Null then
+										else if (c+1) > 9 ||  right /= Null then
 										       (-1) * score
 									    else score
 									 
@@ -202,14 +202,14 @@ getInDiagSecunUp :: Board -> Cell -> Integer -> Integer -> Integer -> Integer
 getInDiagSecunUp board player l c score = let up = getValBoard (l-1) (c+1) board in
 										    if up == player then 
 										      getInDiagSecunUp board player (l-1) (c+1) (score+1)
-										    else if (l-1) < 0 || (c+1) > 9 || up /= Null then
+										    else if (l-1) < 0 || (c+1) > 9 ||  not (up == Null) then
 										           (-1) * score
 									        else score
 getInDiagSecunDown :: Board -> Cell -> Integer -> Integer -> Integer -> Integer
 getInDiagSecunDown board player l c score = let down = getValBoard (l+1) (c-1) board in
 										      if down == player  then 
 										        getInDiagSecunDown board player (l+1) (c-1) (score+1)
-										      else if (l+1) > 9 || (c-1) < 0 || down /= Null then
+										      else if (l+1) > 9 || (c-1) < 0 || not (down == Null) then
 										             (-1) * score
 									               else score													 
 
@@ -283,7 +283,7 @@ scoremoveMinMax board P playerInit depth = let scoreP = getBestScore board P 0 0
 											 else (scoremoveMinMax (replaceValBoard (fst moveP) (snd moveP) P board) C playerInit (depth-1)) - scoreP
 moveComputer :: Board -> Board
 moveComputer board = let scoreC = scoremoveMinMax board C C 3
-                         scoreP = scoremoveMinMax board P P 3 
+                         scoreP = scoremoveMinMax board P P 3
                          moveC = getBestScoreMove board C 0 0 0 0 0
                          moveP = getBestScoreMove board P 0 0 0 0 0 in
 					   if scoreC > scoreP then
@@ -291,10 +291,12 @@ moveComputer board = let scoreC = scoremoveMinMax board C C 3
 					   else replaceValBoard (fst moveP) (snd moveP) C board 
 					   
 --ex de test
+{-
 exBigBoard = replaceValBoard 0 1 C (generateBoard 10)
-exDiagBoard1 = Board [[Null, P, Null, Null, Null, Null, Null], [Null, Null, P, Null, Null, Null, Null],
+exDiagBoard1 = Board [[Null, P, P, P, P, Null, Null], [Null, Null, P, Null, Null, Null, Null],
                [Null, Null, Null, P, Null, Null, Null], [Null, Null, Null, Null, P, Null, Null], 
                [Null, Null, Null, Null, Null, Null, Null],[Null, Null, Null, Null, Null, P, Null]]
 
 exColBoard = Board [[P,C,Null,Null,Null,Null], [P,C,Null,Null,Null,P], [Null,C,Null,P,Null,Null],
        	   [Null,C,Null,P,Null,Null], [P,C,Null,Null,P,Null], [Null, Null, Null, Null, Null, P, Null]]
+		   -}
